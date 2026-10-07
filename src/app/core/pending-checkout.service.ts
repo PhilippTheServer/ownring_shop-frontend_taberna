@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-export interface PendingCheckout { orderId: string; customerId: string; clientSecret: string; createdAt: string; }
+export interface PendingCheckout { orderId: string; customerId: string; clientSecret: string; provider?: 'stripe' | 'paypal'; createdAt: string; }
 const KEY = 'opentaberna-pending-checkout-v2';
 
 @Injectable({ providedIn: 'root' })

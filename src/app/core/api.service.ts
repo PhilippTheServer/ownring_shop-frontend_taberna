@@ -32,6 +32,6 @@ export class ApiService {
   deleteAddress(id: string) { return this.http.delete<void>(`${this.base}/customers/me/addresses/${id}`); }
   createOrder(customerId: string, lines: Array<{sku:string;quantity:number}>) { return this.http.post<Order>(`${this.base}/orders/`, { items: lines, currency: 'EUR' }, { headers: { 'X-Customer-ID': customerId } }); }
   order(customerId: string, orderId: string) { return this.http.get<Order>(`${this.base}/orders/${orderId}`, { headers: { 'X-Customer-ID': customerId } }); }
-  checkout(customerId: string, orderId: string) { return this.http.post<CheckoutResponse>(`${this.base}/orders/${orderId}/checkout`, {}, { headers: { 'X-Customer-ID': customerId } }); }
+  checkout(customerId: string, orderId: string, provider: 'stripe' | 'paypal' = 'stripe') { return this.http.post<CheckoutResponse>(`${this.base}/orders/${orderId}/checkout`, {}, { headers: { 'X-Customer-ID': customerId }, params: new HttpParams().set('provider', provider) }); }
   cancelOrder(customerId: string, orderId: string) { return this.http.delete<void>(`${this.base}/orders/${orderId}`, { headers: { 'X-Customer-ID': customerId } }); }
 }

@@ -16,5 +16,10 @@ export const routes: Routes = [
   { path: 'cart', loadComponent: () => import('./pages/cart.component').then(m => m.CartComponent) },
   { path: 'checkout', canActivate: [signedIn], loadComponent: () => import('./pages/checkout.component').then(m => m.CheckoutComponent) },
   { path: 'account', canActivate: [signedIn], loadComponent: () => import('./pages/account.component').then(m => m.AccountComponent) },
+  { path: 'app', loadComponent: () => import('./pages/app-delivery.component').then(m => m.AppDeliveryComponent) },
+  { path: 'impressum', loadComponent: () => import('./pages/legal-impressum.component').then(m => m.LegalImpressumComponent) },
+  { path: 'datenschutz', loadComponent: () => import('./pages/legal-privacy.component').then(m => m.LegalPrivacyComponent) },
+  { path: 'widerruf', loadComponent: () => import('./pages/legal-withdrawal.component').then(m => m.LegalWithdrawalComponent) },
+  { path: 'produktsicherheit', loadComponent: () => import('./pages/legal-safety.component').then(m => m.LegalSafetyComponent) },
   { path: '**', redirectTo: '' },
 ];
