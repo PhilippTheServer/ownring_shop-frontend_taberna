@@ -34,3 +34,10 @@ npx ng build --configuration production
 
 Update the docs in the same PR as the change, not afterwards, and add a test that would
 fail if your fix regressed.
+
+
+## Repository Rules
+
+- **No direct commits or pushes to `main`.** All changes go through a pull request.
+- Open a PR against `main` for every change, then **squash-merge** it and **delete the branch** (locally and remotely).
+- Commit messages use the format `<prefix>(feature): message` (imperative, concise, no trailing period).
