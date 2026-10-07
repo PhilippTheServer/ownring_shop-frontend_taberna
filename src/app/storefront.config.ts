@@ -8,6 +8,16 @@ export const storefrontConfig = {
   stripePublishableKey: '',
 
   /**
+   * PayPal Checkout (smart buttons / Orders API).
+   *
+   * `clientId` is the public PayPal REST client id (safe to ship to the
+   * browser). Leave it empty to hide the PayPal option at checkout — the
+   * customer then pays with a card via Stripe only. The backend must have
+   * matching PAYPAL_* credentials configured for the option to work.
+   */
+  paypalClientId: '',
+
+  /**
    * Anonymous shopper telemetry.
    *
    * Off by default: cloning this repository must not start collecting anything.
