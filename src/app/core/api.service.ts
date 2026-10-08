@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs';
-import { Address, AddressInput, CheckoutResponse, Customer, Item, ItemPage, Order } from '../models';
+import { Address, AddressInput, CheckoutResponse, Customer, GuestCheckoutInput, Item, ItemPage, Order } from '../models';
 import { storefrontConfig } from '../storefront.config';
 
 // The API answers media as paths from its own root ("/v1/items/…/image"); the
@@ -33,5 +33,6 @@ export class ApiService {
   createOrder(customerId: string, lines: Array<{sku:string;quantity:number}>) { return this.http.post<Order>(`${this.base}/orders/`, { items: lines, currency: 'EUR' }, { headers: { 'X-Customer-ID': customerId } }); }
   order(customerId: string, orderId: string) { return this.http.get<Order>(`${this.base}/orders/${orderId}`, { headers: { 'X-Customer-ID': customerId } }); }
   checkout(customerId: string, orderId: string, provider: 'stripe' | 'paypal' = 'stripe') { return this.http.post<CheckoutResponse>(`${this.base}/orders/${orderId}/checkout`, {}, { headers: { 'X-Customer-ID': customerId }, params: new HttpParams().set('provider', provider) }); }
+  guestCheckout(body: GuestCheckoutInput, provider: 'stripe' | 'paypal' = 'stripe') { return this.http.post<CheckoutResponse>(`${this.base}/orders/guest-checkout`, body, { params: new HttpParams().set('provider', provider) }); }
   cancelOrder(customerId: string, orderId: string) { return this.http.delete<void>(`${this.base}/orders/${orderId}`, { headers: { 'X-Customer-ID': customerId } }); }
 }
