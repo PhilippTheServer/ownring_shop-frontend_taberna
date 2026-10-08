@@ -7,8 +7,8 @@ import { AuthService } from '../core/auth.service';
 import { CartService } from '../core/cart.service';
 import { I18nService } from '../core/i18n.service';
 import { PendingCheckout, PendingCheckoutService } from '../core/pending-checkout.service';
-import { Address, AddressInput, CheckoutResponse, Customer, Order } from '../models';
-import { errorMessage, money } from '../core/format';
+import { Address, AddressInput, CheckoutResponse, Customer, Item, Order } from '../models';
+import { errorMessage, lineLabel, money } from '../core/format';
 import { storefrontConfig } from '../storefront.config';
 
 type Provider = 'stripe' | 'paypal';
@@ -122,7 +122,7 @@ const SHIPPING_COUNTRIES = ['DE', 'AT', 'BE', 'BG', 'CY', 'CZ', 'DK', 'EE', 'ES'
               @for (line of cart.lines(); track line.item.uuid) {
                 <div class="flex items-center gap-4">
                   <div class="inset grid h-16 w-16 shrink-0 place-items-center p-1.5"><img src="/img/ring-thumb.webp" width="360" height="354" alt=""></div>
-                  <div class="flex-1 text-sm"><p class="font-medium">{{ line.item.name }}</p><p class="font-mono text-xs text-faint">{{ line.quantity }} ×</p></div>
+                  <div class="flex-1 text-sm"><p class="font-medium">{{ label(line.item) }}</p><p class="font-mono text-xs text-faint">{{ line.quantity }} ×</p></div>
                   <strong class="font-mono">{{ format(line.item.price.amount * line.quantity) }}</strong>
                 </div>
               }
@@ -300,5 +300,6 @@ export class CheckoutComponent implements OnDestroy {
   private validContact() { return !!(this.contact.email.includes('@') && this.contact.first_name.trim() && this.contact.last_name.trim()); }
   private fail(e: unknown) { this.error.set(errorMessage(e)); this.loading.set(false); this.working.set(false); }
   format(amount: number) { return money(amount, 'EUR', this.i18n.lang()); }
+  label(item: Item) { return lineLabel(item, (key) => this.i18n.t(key)); }
   total() { return this.format(this.cart.total()); }
 }

@@ -1,7 +1,7 @@
 export const storefrontConfig = {
   apiUrl: '/api/v1',
-  /** The one product this storefront sells. */
-  productSku: 'OWNRING-R02',
+  /** The one product this storefront sells; one SKU per ring size (OWNRING-R02-08 … -13). */
+  productSkuPrefix: 'OWNRING-R02-',
   keycloak: {
     url: 'http://localhost:8080',
     realm: 'opentaberna',

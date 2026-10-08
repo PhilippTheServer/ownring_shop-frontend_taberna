@@ -10,8 +10,8 @@ import { r02, stubStorage } from '../test-fixtures';
 
 /**
  * The product page is the whole shop: the price must come from the catalogue
- * (not the copy), and buying must put exactly one ring in the cart however
- * often the button is pressed.
+ * (not the copy), a ring can only be bought in a chosen size, and buying must
+ * put exactly one ring in the cart however often the button is pressed.
  */
 describe('HomeComponent', () => {
   beforeEach(() => {
@@ -21,35 +21,44 @@ describe('HomeComponent', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  function render(item: Item = r02) {
+  function render(items: Item[]) {
     const fixture = TestBed.createComponent(HomeComponent);
     TestBed.inject(HttpTestingController)
       .expectOne((req) => req.url === '/api/v1/items/')
-      .flush({ items: [item], page_info: { page: 1, size: 10, total: 1, pages: 1 } });
+      .flush({ items, page_info: { page: 1, size: 50, total: items.length, pages: 1 } });
     fixture.detectChanges();
-    return fixture.nativeElement as HTMLElement;
+    const el = fixture.nativeElement as HTMLElement;
+    return { el, click: (selector: string) => { el.querySelector<HTMLButtonElement>(selector)!.click(); fixture.detectChanges(); } };
   }
 
+  const sizes = (el: HTMLElement) => [...el.querySelectorAll<HTMLButtonElement>('[data-testid^="size-"]')];
+
   it('shows the catalogue price of the R02', () => {
-    const el = render({ ...r02, price: { amount: 12900, currency: 'EUR' } });
+    const { el } = render([r02(11, { price: { amount: 12900, currency: 'EUR' } })]);
     expect(el.querySelector('[data-testid="price"]')?.textContent?.replace(/\s/g, ' ').trim()).toBe('129 €');
   });
 
-  it('puts one R02 in the cart and goes to checkout', () => {
-    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
-    const el = render();
-    const buy = el.querySelector<HTMLButtonElement>('[data-testid="buy"]')!;
+  it('offers sizes smallest first and blocks sold-out ones', () => {
+    const soldOut = r02(11, { inventory: { stock_quantity: 0, stock_status: 'out_of_stock', allow_backorder: false } });
+    const { el } = render([r02(13), soldOut, r02(8), { ...r02(9), sku: 'OTHER-9' }]);
 
-    buy.click();
-    buy.click();
-
-    const lines = TestBed.inject(CartService).lines();
-    expect(lines.map((l) => [l.item.sku, l.quantity])).toEqual([['OWNRING-R02', 1]]);
-    expect(navigate).toHaveBeenCalledWith('/checkout');
+    expect(sizes(el).map((b) => b.querySelector('span')?.textContent?.trim())).toEqual(['8', '11', '13']);
+    expect(sizes(el).map((b) => b.disabled)).toEqual([false, true, false]);
   });
 
-  it('disables buying when the ring is out of stock', () => {
-    const el = render({ ...r02, inventory: { stock_quantity: 0, stock_status: 'out_of_stock', allow_backorder: false } });
-    expect(el.querySelector<HTMLButtonElement>('[data-testid="buy"]')!.disabled).toBe(true);
+  it('buys only after a size is chosen, one ring of that size, then checks out', () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const { el, click } = render([8, 9, 10, 11, 12, 13].map((s) => r02(s)));
+    const buy = () => el.querySelector<HTMLButtonElement>('[data-testid="buy"]')!;
+
+    expect(buy().disabled).toBe(true);
+
+    click('[data-testid="size-9"]');
+    click('[data-testid="buy"]');
+    click('[data-testid="buy"]');
+
+    const lines = TestBed.inject(CartService).lines();
+    expect(lines.map((l) => [l.item.sku, l.quantity])).toEqual([['OWNRING-R02-09', 1]]);
+    expect(navigate).toHaveBeenCalledWith('/checkout');
   });
 });

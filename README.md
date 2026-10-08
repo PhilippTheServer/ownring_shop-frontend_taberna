@@ -6,12 +6,14 @@ The shop for the **OwnRing R02**: a single-product page plus cart, checkout (gue
 
 | Route | What it is |
 |---|---|
-| `/` | The product page: hero and buy box, metrics, why OwnRing, the app, about, datasheet, limits, FAQ. `/shop` and `/shop/:id` redirect here. |
+| `/` | The product page: hero and buy box with the size picker, metrics, why OwnRing, the app, about, datasheet, limits, FAQ. `/shop` and `/shop/:id` redirect here. |
 | `/cart` | Cart |
 | `/checkout` | Checkout. Signed out → guest form (`POST /v1/orders/guest-checkout`); signed in → saved address and the account order flow. No sign-in required. |
 | `/account` | Customer account (sign-in required) |
 | `/app` | App download after purchase; links come from the product's `custom.app` catalogue field |
 | `/impressum`, `/datenschutz`, `/widerruf`, `/produktsicherheit` | Legal pages |
+
+**Sizes:** every ring size is its own catalogue item (SKU `OWNRING-R02-08` … `-13`, `productSkuPrefix` in `storefront.config.ts`) with `size` and `inner_diameter_mm` in its attributes. The page lists them smallest first, greys out sold-out sizes and enables buying once a size is chosen.
 
 All copy lives in `src/app/core/i18n.service.ts` (German default, English); a test fails if a key exists in only one language.
 

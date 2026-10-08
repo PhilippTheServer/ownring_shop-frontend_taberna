@@ -54,7 +54,7 @@ export class AppDeliveryComponent {
   constructor() {
     this.api.items(0, 10).subscribe({
       next: (page) => {
-        const r02 = page.items.find((i) => i.sku === storefrontConfig.productSku) ?? page.items[0];
+        const r02 = page.items.find((i) => i.sku.startsWith(storefrontConfig.productSkuPrefix)) ?? page.items[0];
         this.app.set((r02?.custom?.['app'] as AppInfo | undefined) ?? null);
       },
       error: () => this.app.set(null),

@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../core/cart.service';
 import { I18nService } from '../core/i18n.service';
-import { money } from '../core/format';
+import { lineLabel, money } from '../core/format';
+import { Item } from '../models';
 
 @Component({
   imports: [RouterLink],
@@ -23,9 +24,9 @@ import { money } from '../core/format';
           <div class="card divide-y divide-white/[.06]">
             @for (line of cart.lines(); track line.item.uuid) {
               <article class="grid grid-cols-[5.5rem_1fr] items-center gap-5 p-5 sm:grid-cols-[6.5rem_1fr_auto]">
-                <div class="inset grid aspect-square place-items-center p-2"><img src="/img/ring-thumb.webp" width="360" height="354" [alt]="line.item.name"></div>
+                <div class="inset grid aspect-square place-items-center p-2"><img src="/img/ring-thumb.webp" width="360" height="354" [alt]="label(line.item)"></div>
                 <div>
-                  <a routerLink="/" class="text-lg font-semibold tracking-tight">{{ line.item.name }}</a>
+                  <a routerLink="/" class="text-lg font-semibold tracking-tight">{{ label(line.item) }}</a>
                   <p class="mt-0.5 font-mono text-xs text-faint">{{ line.item.sku }}</p>
                   <div class="mt-4 flex items-center gap-2">
                     <button type="button" class="grid h-8 w-8 cursor-pointer place-items-center rounded-full border hairline hover:bg-white/5" [attr.aria-label]="i18n.t('cart.less')" (click)="cart.quantity(line.item.uuid, line.quantity - 1)">−</button>
@@ -56,4 +57,5 @@ export class CartComponent {
   readonly cart = inject(CartService);
   readonly i18n = inject(I18nService);
   format(amount: number, currency = 'EUR') { return money(amount, currency, this.i18n.lang()); }
+  label(item: Item) { return lineLabel(item, (key) => this.i18n.t(key)); }
 }
