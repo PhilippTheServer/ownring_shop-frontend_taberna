@@ -1,5 +1,7 @@
 export const storefrontConfig = {
   apiUrl: '/api/v1',
+  /** The one product this storefront sells. */
+  productSku: 'OWNRING-R02',
   keycloak: {
     url: 'http://localhost:8080',
     realm: 'opentaberna',

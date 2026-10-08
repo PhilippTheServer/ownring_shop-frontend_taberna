@@ -11,10 +11,10 @@ const signedIn = async () => {
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./pages/home.component').then(m => m.HomeComponent) },
-  { path: 'shop', loadComponent: () => import('./pages/shop.component').then(m => m.ShopComponent) },
-  { path: 'shop/:id', loadComponent: () => import('./pages/product.component').then(m => m.ProductComponent) },
+  { path: 'shop', redirectTo: '' },
+  { path: 'shop/:id', redirectTo: '' },
   { path: 'cart', loadComponent: () => import('./pages/cart.component').then(m => m.CartComponent) },
-  { path: 'checkout', canActivate: [signedIn], loadComponent: () => import('./pages/checkout.component').then(m => m.CheckoutComponent) },
+  { path: 'checkout', loadComponent: () => import('./pages/checkout.component').then(m => m.CheckoutComponent) },
   { path: 'account', canActivate: [signedIn], loadComponent: () => import('./pages/account.component').then(m => m.AccountComponent) },
   { path: 'app', loadComponent: () => import('./pages/app-delivery.component').then(m => m.AppDeliveryComponent) },
   { path: 'impressum', loadComponent: () => import('./pages/legal-impressum.component').then(m => m.LegalImpressumComponent) },

@@ -16,6 +16,7 @@ export interface ItemPage { items: Item[]; page_info: PageInfo; }
 export interface Customer { id: string; keycloak_user_id: string; email: string; first_name: string; last_name: string; phone?: string | null; created_at: string; updated_at: string; }
 export interface Address { id: string; customer_id: string; street: string; city: string; zip_code: string; country: string; is_default: boolean; created_at: string; updated_at: string; }
 export interface AddressInput { street: string; city: string; zip_code: string; country: string; is_default: boolean; }
+export interface GuestCheckoutInput { email: string; first_name: string; last_name: string; phone?: string | null; address: Omit<AddressInput, 'is_default'>; items: Array<{ sku: string; quantity: number }>; currency: string; }
 export interface CartLine { item: Item; quantity: number; }
 export interface OrderLine { id: string; order_id: string; sku: string; quantity: number; unit_price: number; created_at: string; updated_at: string; }
 export interface Order { id: string; customer_id: string; currency: string; status: 'draft'|'pending_payment'|'paid'|'ready_to_ship'|'shipped'|'cancelled'; total_amount: number; items?: OrderLine[]; created_at: string; updated_at: string; deleted_at?: string|null; }

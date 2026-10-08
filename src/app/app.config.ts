@@ -18,7 +18,7 @@ import { authInterceptor } from './core/auth.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
+    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })),
     provideAppInitializer(() => inject(AuthService).init()),
     provideAppInitializer(() => inject(AnalyticsService).init()),
     { provide: ErrorHandler, useClass: TelemetryErrorHandler },
