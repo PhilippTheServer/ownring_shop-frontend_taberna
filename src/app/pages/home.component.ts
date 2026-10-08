@@ -4,7 +4,7 @@ import { AnalyticsService } from '../core/analytics.service';
 import { ApiService } from '../core/api.service';
 import { CartService } from '../core/cart.service';
 import { I18nService } from '../core/i18n.service';
-import { money } from '../core/format';
+import { money, ringSize } from '../core/format';
 import { Item } from '../models';
 import { storefrontConfig } from '../storefront.config';
 
@@ -35,22 +35,35 @@ function line(values: number[]): string {
           </ul>
 
           <div id="buy" class="card mt-10 max-w-xl p-6 sm:p-7">
-            <div class="flex flex-wrap items-end justify-between gap-6">
-              <div>
-                <p class="flex items-baseline gap-3">
-                  <span class="text-5xl font-semibold tracking-tight" data-testid="price">{{ price() }}</span>
-                  <span class="text-muted">{{ i18n.t('price.oneTime') }}</span>
+            <div class="flex flex-wrap items-baseline justify-between gap-4">
+              <p class="flex items-baseline gap-3">
+                <span class="text-5xl font-semibold tracking-tight" data-testid="price">{{ price() }}</span>
+                <span class="text-muted">{{ i18n.t('price.oneTime') }}</span>
+              </p>
+              @if (sizes().length) {
+                <p class="flex items-center gap-2 text-sm">
+                  <span class="dot" [class.bg-steps]="inStock()" [class.bg-stress]="!inStock()"></span>{{ inStock() ? i18n.t('stock.in') : i18n.t('stock.out') }}
                 </p>
-                @if (product(); as p) {
-                  <p class="mt-2 flex items-center gap-2 text-sm">
-                    <span class="dot" [class.bg-steps]="available()" [class.bg-stress]="!available()"></span>{{ available() ? i18n.t('stock.in') : i18n.t('stock.out') }}
-                  </p>
+              }
+            </div>
+            <fieldset class="mt-6">
+              <legend class="flex w-full items-baseline justify-between text-sm">
+                <span>{{ i18n.t('size.pick') }}</span>
+                <a routerLink="/" fragment="faq" class="text-muted transition hover:text-ink">{{ i18n.t('size.help') }}</a>
+              </legend>
+              <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                @for (s of sizes(); track s.uuid) {
+                  <button type="button" class="size" [class.selected]="selected()?.uuid === s.uuid" [disabled]="!available(s)"
+                    [attr.aria-pressed]="selected()?.uuid === s.uuid" [attr.data-testid]="'size-' + size(s)" (click)="selected.set(s)">
+                    <span class="block text-lg font-semibold">{{ size(s) }}</span>
+                    <span class="block font-mono text-[11px] text-faint">Ø {{ diameter(s) }}</span>
+                  </button>
                 }
               </div>
-              <button type="button" class="btn btn-primary min-w-44 text-base" data-testid="buy" [disabled]="!available()" (click)="buy()">
-                {{ product() && !available() ? i18n.t('buy.unavailable') : i18n.t('buy.cta') }}
-              </button>
-            </div>
+            </fieldset>
+            <button type="button" class="btn btn-primary mt-6 w-full text-base" data-testid="buy" [disabled]="!canBuy()" (click)="buy()">
+              @if (selected(); as s) { {{ i18n.t('buy.cta') }} · {{ i18n.t('size.label') }} {{ size(s) }} } @else { {{ i18n.t('buy.pickSize') }} }
+            </button>
             @if (loadError()) { <p class="mt-4 text-sm text-pulse">{{ i18n.t('buy.loadError') }}</p> }
             <p class="mt-5 border-t hairline pt-4 text-sm text-muted">{{ i18n.t('buy.trust') }}</p>
             <p class="mt-1.5 text-xs leading-5 text-faint">{{ i18n.t('price.note') }}</p>
@@ -277,10 +290,16 @@ function line(values: number[]): string {
         <img src="/img/ring-thumb.webp" width="360" height="354" loading="lazy" alt="" class="relative mx-auto w-40">
         <h2 class="headline relative mt-8 text-4xl sm:text-6xl">{{ i18n.t('cta.title') }}</h2>
         <p class="lede relative mt-4">{{ i18n.t('cta.copy') }}</p>
-        <button type="button" class="btn btn-primary relative mt-9 text-base" [disabled]="!available()" (click)="buy()">{{ i18n.t('buy.cta') }} · {{ price() }}</button>
+        <button type="button" class="btn btn-primary relative mt-9 text-base" [disabled]="!inStock()" (click)="selected() ? buy() : pickSize()">{{ i18n.t('buy.cta') }} · {{ price() }}</button>
       </div>
     </section>
   `,
+  styles: [`
+    .size { cursor: pointer; border: 1px solid rgb(255 255 255 / 10%); border-radius: 14px; padding: .55rem .25rem; text-align: center; transition: border-color .15s ease, background .15s ease; }
+    .size:not(:disabled):hover { border-color: rgb(255 255 255 / 28%); }
+    .size.selected { border-color: var(--color-pulse); background: rgb(250 135 133 / 8%); }
+    .size:disabled { cursor: not-allowed; opacity: .35; text-decoration: line-through; }
+  `],
 })
 export class HomeComponent {
   private readonly api = inject(ApiService);
@@ -289,14 +308,17 @@ export class HomeComponent {
   private readonly cart = inject(CartService);
   readonly i18n = inject(I18nService);
 
-  readonly product = signal<Item | null>(null);
+  /** The R02 in every size, smallest first; each size is its own catalogue item. */
+  readonly sizes = signal<Item[]>([]);
+  readonly selected = signal<Item | null>(null);
   readonly loadError = signal(false);
-  readonly available = computed(() => {
-    const p = this.product();
-    return !!p && (p.inventory.stock_status === 'in_stock' || p.inventory.allow_backorder);
+  readonly inStock = computed(() => this.sizes().some((s) => this.available(s)));
+  readonly canBuy = computed(() => {
+    const s = this.selected();
+    return !!s && this.available(s);
   });
   readonly price = computed(() => {
-    const p = this.product();
+    const p = this.selected() ?? this.sizes()[0];
     return p ? money(p.price.amount, p.price.currency, this.i18n.lang()) : '— €';
   });
 
@@ -328,24 +350,35 @@ export class HomeComponent {
     { key: 'specs.water' }, { key: 'specs.size' }, { key: 'specs.app' }, { key: 'specs.box' }, { key: 'specs.price' },
   ];
   readonly limits = ['limits.1', 'limits.2', 'limits.3', 'limits.4'];
-  readonly faq = [1, 2, 3, 4, 5, 6];
+  readonly faq = [1, 7, 2, 3, 4, 5, 6];
 
   constructor() {
-    this.api.items(0, 10).subscribe({
+    this.api.items().subscribe({
       next: (page) => {
-        const item = page.items.find((i) => i.sku === storefrontConfig.productSku) ?? page.items[0] ?? null;
-        this.product.set(item);
-        if (item) this.analytics.track('product_view', { sku: item.sku, path: '/' });
+        const sizes = page.items
+          .filter((i) => i.sku.startsWith(storefrontConfig.productSkuPrefix) && ringSize(i))
+          .sort((a, b) => ringSize(a)! - ringSize(b)!);
+        this.sizes.set(sizes);
+        if (sizes.length) this.analytics.track('product_view', { sku: storefrontConfig.productSkuPrefix.slice(0, -1), path: '/' });
       },
       error: () => this.loadError.set(true),
     });
   }
 
+  available(item: Item): boolean { return item.inventory.stock_status === 'in_stock' || item.inventory.allow_backorder; }
+  size(item: Item): number | null { return ringSize(item); }
+  diameter(item: Item): string {
+    const mm = Number(item.attributes?.['inner_diameter_mm']);
+    return `${new Intl.NumberFormat(this.i18n.lang() === 'de' ? 'de-DE' : 'en-IE', { minimumFractionDigits: 1 }).format(mm)} mm`;
+  }
+
   /** One ring per click is the common case, so buying goes straight to checkout. */
   buy(): void {
-    const item = this.product();
-    if (!item) return;
+    const item = this.selected();
+    if (!item || !this.available(item)) return;
     if (!this.cart.lines().some((line) => line.item.uuid === item.uuid)) this.cart.add(item);
     void this.router.navigateByUrl('/checkout');
   }
+
+  pickSize(): void { void this.router.navigate([], { fragment: 'buy' }); }
 }

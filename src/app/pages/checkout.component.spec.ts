@@ -23,7 +23,7 @@ describe('CheckoutComponent as a guest', () => {
       ],
     });
     http = TestBed.inject(HttpTestingController);
-    TestBed.inject(CartService).add(r02);
+    TestBed.inject(CartService).add(r02(11));
   });
 
   afterEach(() => { http.verify(); vi.unstubAllGlobals(); });
@@ -47,7 +47,7 @@ describe('CheckoutComponent as a guest', () => {
     expect(req.request.body).toEqual({
       email: 'ada@example.org', first_name: 'Ada', last_name: 'Lovelace',
       address: { street: 'Musterstr. 1', city: 'Bochum', zip_code: '44787', country: 'DE' },
-      items: [{ sku: 'OWNRING-R02', quantity: 1 }], currency: 'EUR',
+      items: [{ sku: 'OWNRING-R02-11', quantity: 1 }], currency: 'EUR',
     });
   });
 
