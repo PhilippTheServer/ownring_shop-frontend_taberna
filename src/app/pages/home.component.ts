@@ -185,7 +185,7 @@ function line(values: number[]): string {
           @for (shot of shots; track shot.src; let i = $index) {
             <figure class="w-[46%] max-w-[16.5rem]" [class.translate-y-10]="i === 1">
               <div class="rounded-[2.4rem] border border-white/10 bg-black p-[5px] shadow-[0_30px_80px_rgb(0_0_0/70%)]">
-                <img [src]="shot.src" width="1080" height="2280" loading="lazy" [alt]="i18n.t(shot.alt)" class="w-full rounded-[2.1rem]">
+                <img [src]="shot.src" width="720" height="1493" loading="lazy" [alt]="i18n.t(shot.alt)" class="w-full rounded-[2.1rem]">
               </div>
               <figcaption class="label mt-4 text-center">{{ i18n.t(shot.caption) }}</figcaption>
             </figure>
