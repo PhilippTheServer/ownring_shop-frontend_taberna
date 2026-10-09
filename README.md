@@ -23,10 +23,13 @@ Dark, matched to the OwnRing app's design tokens (`app/lib/ui/tokens.dart` in th
 
 The app bundles regular/medium/semibold Geist and regular/medium Geist Mono; the store's variable fonts have matching family/version metadata and provide the same weights. Both use tabular figures. Core colours are background `#050506`, cards `#141416`, text `#f4f4f2`, muted `#8d8d92`, pulse `#fa8785`, HRV `#ad9dff`, stress `#e69c3a`, SpO₂ `#3cbbf9` and steps `#65c67d`.
 
-Pictures live in `public/img/` and can be replaced by photos with the same file names:
+Pictures live in `public/img/` and are served locally (no visitor requests to COLMi's CDN):
 
-- `ring-hero.webp`, `ring-inside.webp`, `ring-thumb.webp` — renders of the R02, produced by `tools/ring-render/` (see its README).
+- `colmi-r02-front.webp`, `colmi-r02-inside.webp`, `colmi-r02-thumb.webp` — static black R02 manufacturer product images, used throughout the product page, cart and checkout. Converted to WebP without metadata; front/inside are 1000 × 1000, thumbnail 360 × 360. No floating ring or animated pulse line. Removed sensor pins positioned for the old custom render rather than mislabel this view.
+- `ring-hero.webp`, `ring-inside.webp`, `ring-thumb.webp` — unused legacy renders produced by `tools/ring-render/`, retained as reference. Re-running that tool does not replace the current manufacturer images.
 - `app-today.webp`, `app-devices.webp` — reference screenshots of the OwnRing app (status bar cropped), no longer displayed on the product page.
+
+**Manufacturer image sources (retrieved 2026-10-09):** [COLMi R02 product page](https://www.colmi.info/products/colmi-r02-smart-ring); [front / Black1](https://www.colmi.info/cdn/shop/files/SmartRingCOLMIR02Black1.jpg?v=1753867892&width=1000), [inside / Black2](https://www.colmi.info/cdn/shop/files/SmartRingCOLMIR02Black2.jpg?v=1753867892&width=1000), [thumbnail / Black3](https://www.colmi.info/cdn/shop/files/SmartRingCOLMIR02Black3.jpg?v=1753867892&width=1000). These appear to be manufacturer renders, not confirmed photographs. They are third-party COLMi imagery, not covered by this repository's Apache licence; permission for commercial reuse has **not** been verified and must be confirmed before public commercial publication.
 
 The landing hero embeds `src/app/components/app-demo.component.ts`, a lightweight simulation of the Today and Devices screens. Visitors can expand the five metrics, switch day/week/month/year, start/stop a sample live-pulse display, simulate sync and connect/disconnect, and switch German/English. All readings are invented and labelled as sample data; the demo needs no backend, Bluetooth, login or additional dependency. It is not the Flutter app and does not reproduce real measurement timing or ring discovery.
 

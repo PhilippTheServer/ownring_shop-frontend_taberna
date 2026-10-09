@@ -72,7 +72,7 @@ export const DE: Record<string, string> = {
   'hero.chip.cloud': 'Keine Cloud',
   'hero.chip.account': 'Kein Konto',
   'hero.chip.sub': 'Kein Abo',
-  'hero.alt': 'Der OwnRing R02, ein dunkler Smart-Ring aus Metall',
+  'hero.alt': 'Schwarzer COLMi R02 Smart-Ring – Produktbild des Herstellers',
 
   'measure.label': '01 · Messwerte',
   'measure.title': 'Fünf Werte. Rund um die Uhr.',
@@ -92,7 +92,7 @@ export const DE: Record<string, string> = {
   'inside.sensor': 'Optischer Pulssensor mit grünen und roten LEDs',
   'inside.pads': 'Magnetische Ladekontakte',
   'inside.motion': 'Beschleunigungssensor für Schritte, im Ring vergossen',
-  'inside.alt': 'Innenseite des Rings mit Sensorfenster und Ladekontakten',
+  'inside.alt': 'COLMi R02 von innen mit Sensoren und Ladeanschluss – Produktbild des Herstellers',
 
   'showcase.label': '02 · Die App',
   'showcase.title': 'Alles auf deinem Handy. Nichts woanders.',
@@ -330,7 +330,7 @@ export const EN: Record<string, string> = {
   'hero.chip.cloud': 'No cloud',
   'hero.chip.account': 'No account',
   'hero.chip.sub': 'No subscription',
-  'hero.alt': 'The OwnRing R02, a dark metal smart ring',
+  'hero.alt': 'Black COLMi R02 smart ring – manufacturer product image',
 
   'measure.label': '01 · What it measures',
   'measure.title': 'Five metrics. Around the clock.',
@@ -350,7 +350,7 @@ export const EN: Record<string, string> = {
   'inside.sensor': 'Optical heart rate sensor with green and red LEDs',
   'inside.pads': 'Magnetic charging contacts',
   'inside.motion': 'Accelerometer for steps, sealed inside the ring',
-  'inside.alt': 'Inside of the ring with the sensor window and charging contacts',
+  'inside.alt': 'Inside of the COLMi R02 with sensors and charging contact – manufacturer product image',
 
   'showcase.label': '02 · The app',
   'showcase.title': 'Everything on your phone. Nothing anywhere else.',

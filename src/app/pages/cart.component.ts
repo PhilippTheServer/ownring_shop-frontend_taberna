@@ -15,7 +15,7 @@ import { Item } from '../models';
 
       @if (!cart.lines().length) {
         <div class="card mt-10 p-10 text-center">
-          <img src="/img/ring-thumb.webp" width="360" height="354" alt="" class="mx-auto w-28 opacity-80">
+          <img src="/img/colmi-r02-thumb.webp" width="360" height="360" alt="" class="mx-auto w-28 rounded-xl">
           <p class="mt-6 text-xl">{{ i18n.t('cart.empty') }}</p>
           <a routerLink="/" class="btn btn-primary mt-6">{{ i18n.t('cart.continue') }}</a>
         </div>
@@ -24,7 +24,7 @@ import { Item } from '../models';
           <div class="card divide-y divide-white/[.06]">
             @for (line of cart.lines(); track line.item.uuid) {
               <article class="grid grid-cols-[5.5rem_1fr] items-center gap-5 p-5 sm:grid-cols-[6.5rem_1fr_auto]">
-                <div class="inset grid aspect-square place-items-center p-2"><img src="/img/ring-thumb.webp" width="360" height="354" [alt]="label(line.item)"></div>
+                <div class="inset grid aspect-square place-items-center p-2"><img src="/img/colmi-r02-thumb.webp" width="360" height="360" [alt]="label(line.item)" class="rounded-lg"></div>
                 <div>
                   <a routerLink="/" class="text-lg font-semibold tracking-tight">{{ label(line.item) }}</a>
                   <p class="mt-0.5 font-mono text-xs text-faint">{{ line.item.sku }}</p>
