@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { I18nService } from '../core/i18n.service';
 
 const RANGES = ['day', 'week', 'month', 'year'] as const;
 type DemoRange = typeof RANGES[number];
+const LIVE_SAMPLES = [72, 74, 71, 73, 75, 70, 72, 69];
 
 /** Invented readings only; never copy health data or captures into the shop. */
 const METRICS = [
@@ -37,37 +38,37 @@ const METRICS = [
       <section class="demo-phone" [attr.aria-label]="i18n.t('demo.title')">
         <div class="demo-scroll" tabindex="0" [attr.aria-label]="i18n.t('demo.scroll')">
           @if (screen() === 'today') {
-            <p class="text-xs text-muted">{{ i18n.t('demo.date') }}</p>
-            <h3 class="mt-1 text-[28px] font-semibold tracking-tight">{{ i18n.t('showcase.today') }}</h3>
+            <p class="text-[13px] text-muted">{{ i18n.t('demo.date') }}</p>
+            <h3 class="mt-1 text-[28px] font-semibold tracking-[-0.02em]">{{ i18n.t('showcase.today') }}</h3>
             <button type="button" class="demo-status" (click)="screen.set('devices')" data-testid="demo-status">
               <span class="text-steps" aria-hidden="true">▰</span> 76 % <span class="text-muted">· {{ i18n.t(synced() ? 'demo.syncedNow' : 'demo.synced') }}</span><span class="ml-auto" aria-hidden="true">›</span>
             </button>
             <div class="card p-4">
               <div class="flex items-center justify-between gap-2">
-                <p class="flex items-center gap-2 text-sm text-muted"><span class="dot" [class.bg-pulse]="live()" [class.bg-muted]="!live()"></span>{{ i18n.t('demo.live') }}</p>
+                <p class="flex items-center gap-2 text-[13px] text-muted"><span class="dot" [class.bg-pulse]="live()" [class.bg-muted]="!live()"></span>{{ i18n.t('demo.live') }}</p>
                 <button type="button" class="demo-pill" [disabled]="!connected()" [attr.aria-pressed]="live()" (click)="live.set(!live())" data-testid="demo-live">{{ i18n.t(live() ? 'demo.stop' : 'demo.start') }}</button>
               </div>
-              <p class="mt-4 flex items-baseline gap-2" aria-live="polite"><span class="text-6xl tracking-tight" [class.text-pulse]="live()" data-testid="demo-live-value">{{ live() ? '72' : '—' }}</span><span class="text-sm text-muted">bpm</span></p>
+              <p class="mt-4 flex items-baseline gap-2" aria-live="polite"><span class="text-[64px] font-medium leading-none tracking-[-0.04em]" [class.text-muted]="!live()" data-testid="demo-live-value">{{ live() ? liveValue() : '—' }}</span><span class="text-[15px] text-muted">bpm</span></p>
               <p class="mt-2 text-xs text-muted">{{ i18n.t(!connected() ? 'demo.disconnected' : live() ? 'demo.liveSample' : 'demo.paused') }}</p>
-              <svg viewBox="0 0 280 50" class="mt-4 h-12 w-full" aria-hidden="true">
-                <path [attr.d]="live() ? 'M0 30 L25 30 L45 28 L65 34 L85 20 L105 25 L125 16 L145 24 L165 20 L185 28 L205 19 L225 22 L250 14 L280 20' : 'M0 30 H280'" fill="none" [attr.stroke]="live() ? 'var(--color-pulse)' : 'var(--color-faint)'" stroke-width="2" />
+              <svg viewBox="0 0 280 50" class="mt-4 h-16 w-full" aria-hidden="true" data-testid="demo-live-chart">
+                <polyline [attr.points]="live() ? livePoints() : '0,30 280,30'" fill="none" [attr.stroke]="live() ? 'var(--color-pulse)' : 'var(--color-faint)'" stroke-width="2" stroke-linejoin="round" />
               </svg>
             </div>
             <div class="mt-6 flex flex-wrap items-center justify-between gap-2">
-              <h4 class="text-sm font-semibold">{{ i18n.t('demo.metrics') }}</h4>
+              <h4 class="text-[15px] font-semibold">{{ i18n.t('demo.metrics') }}</h4>
               <div class="demo-segment" role="group" [attr.aria-label]="i18n.t('demo.range')">
                 @for (r of ranges; track r) {
                   <button type="button" [attr.aria-pressed]="range() === r" (click)="range.set(r)" [attr.data-testid]="'demo-range-' + r">{{ i18n.t('demo.' + r) }}</button>
                 }
               </div>
             </div>
-            <p class="my-4 text-center text-xs text-muted" data-testid="demo-period">{{ i18n.t('demo.period.' + range()) }}</p>
+            <p class="my-4 text-center text-[13px] text-muted" data-testid="demo-period">{{ i18n.t('demo.period.' + range()) }}</p>
             @for (m of metrics(); track m.id) {
               <article class="card mt-3 overflow-hidden">
                 <button type="button" class="demo-metric" [attr.aria-expanded]="open() === m.id" [attr.aria-controls]="'demo-chart-' + m.id" (click)="open.set(open() === m.id ? null : m.id)" [attr.data-testid]="'demo-metric-' + m.id">
-                  <span class="text-left">
-                    <span class="flex items-center gap-2 text-xs text-muted"><span class="dot" [style.background]="m.color"></span>{{ i18n.t('measure.' + m.id) }}</span>
-                    <span class="mt-1 block"><span class="text-2xl font-medium" [attr.data-testid]="'demo-value-' + m.id">{{ number(m.value) }}</span> <span class="text-xs text-muted">{{ m.unit }}</span></span>
+                  <span class="min-w-0 text-left">
+                    <span class="flex items-center gap-2 text-[13px] text-muted"><span class="dot" [style.background]="m.color"></span>{{ i18n.t('measure.' + m.id) }}</span>
+                    <span class="mt-2 flex items-baseline gap-2"><span class="text-[26px] font-medium tracking-[-0.02em]" [attr.data-testid]="'demo-value-' + m.id">{{ number(m.value) }}</span> <span class="text-[13px] text-muted">{{ m.unit }}</span></span>
                   </span>
                   <svg viewBox="0 0 280 100" class="ml-auto h-8 w-20" aria-hidden="true"><polyline [attr.points]="m.points" fill="none" [attr.stroke]="m.color" stroke-width="5" stroke-linejoin="round" /></svg>
                   <span class="text-muted" aria-hidden="true">{{ open() === m.id ? '⌃' : '⌄' }}</span>
@@ -86,7 +87,7 @@ const METRICS = [
                     </svg>
                     <dl class="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
                       @for (stat of [{ key: 'min', value: m.min }, { key: 'avg', value: m.avg }, { key: 'max', value: m.max }]; track stat.key) {
-                        <div class="inset px-1 py-3"><dt class="text-muted">{{ i18n.t('demo.' + stat.key) }}</dt><dd class="mt-1 font-mono">{{ number(stat.value) }} {{ m.unit }}</dd></div>
+                        <div class="inset px-1 py-3"><dt class="text-[11px] text-muted">{{ i18n.t('demo.' + stat.key) }}</dt><dd class="mt-2 flex flex-wrap items-baseline justify-center gap-1 text-[15px] font-medium"><span>{{ number(stat.value) }}</span><span class="text-[11px] text-muted">{{ m.unit }}</span></dd></div>
                       }
                     </dl>
                   </div>
@@ -95,7 +96,7 @@ const METRICS = [
             }
           } @else {
             <p class="text-xs text-muted">{{ i18n.t('demo.known') }}</p>
-            <h3 class="mb-5 mt-1 text-[28px] font-semibold tracking-tight">{{ i18n.t('showcase.devices') }}</h3>
+            <h3 class="mb-5 mt-1 text-[28px] font-semibold tracking-[-0.02em]">{{ i18n.t('showcase.devices') }}</h3>
             <article class="card p-4">
               <div class="flex flex-wrap items-center gap-3">
                 <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-inset text-3xl text-muted" aria-hidden="true">○</span>
@@ -137,14 +138,14 @@ const METRICS = [
   styles: [`
     :host { display: block; }
     .demo-phone { border: 6px solid #232327; border-radius: 2.5rem; overflow: hidden; background: var(--color-screen); box-shadow: 0 30px 80px rgb(0 0 0 / 60%); }
-    .demo-scroll { height: 560px; overflow-y: auto; padding: 22px 14px; scrollbar-width: thin; scrollbar-color: var(--color-control) transparent; overscroll-behavior-y: contain; }
+    .demo-scroll { height: 640px; overflow-y: auto; padding: 22px 14px; scrollbar-width: thin; scrollbar-color: var(--color-control) transparent; overscroll-behavior-y: contain; }
     .demo-status { display: flex; align-items: center; gap: 7px; width: 100%; padding: 16px 2px; text-align: left; font-size: 11px; cursor: pointer; }
     .demo-pill { border-radius: 999px; padding: 9px 13px; background: var(--color-control); font-size: 12px; cursor: pointer; }
     .demo-pill:disabled { opacity: .4; cursor: not-allowed; }
     .demo-segment { display: flex; padding: 3px; border-radius: 999px; background: var(--color-card); }
     .demo-segment button { border-radius: 999px; padding: 7px 10px; font-size: 11px; color: var(--color-muted); cursor: pointer; }
     .demo-segment button[aria-pressed="true"] { background: var(--color-control); color: var(--color-ink); }
-    .demo-metric { display: flex; align-items: center; gap: 10px; width: 100%; padding: 15px; cursor: pointer; }
+    .demo-metric { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; cursor: pointer; }
     .demo-nav { display: flex; border-top: 1px solid var(--color-control); padding: 10px; }
     .demo-nav button { position: relative; flex: 1; padding: 16px 8px 8px; font-size: 13px; color: var(--color-muted); cursor: pointer; }
     .demo-nav button[aria-pressed="true"] { color: var(--color-ink); }
@@ -160,6 +161,21 @@ export class AppDemoComponent {
   readonly synced = signal(false);
   readonly live = signal(false);
   readonly ranges = RANGES;
+  private readonly liveSample = signal(0);
+  readonly liveValue = computed(() => LIVE_SAMPLES[this.liveSample() % LIVE_SAMPLES.length]);
+  readonly livePoints = computed(() => LIVE_SAMPLES.map((_, index) =>
+    `${index * 280 / (LIVE_SAMPLES.length - 1)},${44 - (LIVE_SAMPLES[(index + this.liveSample()) % LIVE_SAMPLES.length] - 60) * 2}`,
+  ).join(' '));
+
+  /** Advances invented readings every 3.5 seconds; cleans up on stop or destruction. */
+  constructor() {
+    effect((onCleanup) => {
+      if (!this.live()) return;
+      this.liveSample.set(0);
+      const timer = setInterval(() => this.liveSample.update((index) => index + 1), 3500);
+      onCleanup(() => clearInterval(timer));
+    });
+  }
 
   /** Summaries and chart coordinates derived from the selected sample period. */
   readonly metrics = computed(() => METRICS.map((metric) => {
