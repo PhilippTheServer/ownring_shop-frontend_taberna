@@ -12,6 +12,7 @@ describe('AppDemoComponent', () => {
 
   afterEach(() => {
     TestBed.inject(HttpTestingController).verify();
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -23,7 +24,7 @@ describe('AppDemoComponent', () => {
     const button = (id: string) => el.querySelector<HTMLButtonElement>(`[data-testid="${id}"]`)!;
     const click = (id: string) => { button(id).click(); fixture.detectChanges(); };
     const text = (id: string) => el.querySelector(`[data-testid="${id}"]`)!.textContent!.trim();
-    return { el, button, click, text };
+    return { fixture, el, button, click, text };
   }
 
   it('labels the data as invented and opens Today with five metrics and the heart-rate chart', () => {
@@ -100,6 +101,54 @@ describe('AppDemoComponent', () => {
     expect(button('demo-range-month').getAttribute('aria-pressed')).toBe('true');
     expect(el.querySelector('#demo-chart-spo2')).not.toBeNull();
     expect(button('demo-status').textContent).toContain('Gerade abgeglichen');
+  });
+
+  it('updates live pulse and its curve every 3.5 seconds, stops, and restarts from the first sample', () => {
+    vi.useFakeTimers();
+    const { fixture, el, click, text } = render();
+    click('demo-live');
+    expect(text('demo-live-value')).toBe('72');
+    const curve = () => el.querySelector('[data-testid="demo-live-chart"] polyline')!.getAttribute('points');
+    const first = curve();
+    vi.advanceTimersByTime(3499);
+    fixture.detectChanges();
+    expect(text('demo-live-value')).toBe('72');
+    vi.advanceTimersByTime(1);
+    fixture.detectChanges();
+    expect(text('demo-live-value')).toBe('74');
+    expect(curve()).not.toBe(first);
+    vi.advanceTimersByTime(3500);
+    fixture.detectChanges();
+    expect(text('demo-live-value')).toBe('71');
+    click('demo-live');
+    expect(vi.getTimerCount()).toBe(0);
+    vi.advanceTimersByTime(7000);
+    fixture.detectChanges();
+    expect(text('demo-live-value')).toBe('—');
+    click('demo-live');
+    expect(text('demo-live-value')).toBe('72');
+    fixture.destroy();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('cleans up live updates on disconnect and keeps them stopped after reconnect', () => {
+    vi.useFakeTimers();
+    const { fixture, click, text } = render();
+    click('demo-live');
+    click('demo-tab-devices');
+    vi.advanceTimersByTime(3500);
+    fixture.detectChanges();
+    click('demo-tab-today');
+    expect(text('demo-live-value')).toBe('74');
+    click('demo-tab-devices');
+    click('demo-connect');
+    expect(vi.getTimerCount()).toBe(0);
+    click('demo-connect');
+    vi.advanceTimersByTime(7000);
+    fixture.detectChanges();
+    click('demo-tab-today');
+    expect(text('demo-live-value')).toBe('—');
+    fixture.destroy();
   });
 
   it('follows the shop language without exposing raw translation keys or requesting data', () => {
