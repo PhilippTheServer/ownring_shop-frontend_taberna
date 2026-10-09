@@ -29,13 +29,8 @@ function line(values: number[]): string {
         </h1>
         <div class="mt-8 grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
           <div class="mx-auto w-full min-w-0 max-w-xl" data-testid="hero-product">
-            <div class="relative mx-auto w-full max-w-[18rem]">
-              <div class="glow absolute inset-[-8%] -z-10 rounded-full"></div>
-              <svg viewBox="0 0 600 120" class="absolute inset-x-[-10%] top-1/2 -z-10 w-[120%] -translate-y-1/2 opacity-40" aria-hidden="true">
-                <path pathLength="1" class="animate-trace" fill="none" stroke="var(--color-pulse)" stroke-width="1.5" stroke-linejoin="round"
-                  d="M0 60 H170 L185 60 L195 30 L208 98 L220 12 L232 84 L242 60 H360 L372 60 L380 44 L390 76 L398 60 H600" />
-              </svg>
-              <img src="/img/ring-hero.webp" width="1667" height="1637" fetchpriority="high" [alt]="i18n.t('hero.alt')" class="animate-float w-full drop-shadow-[0_40px_60px_rgb(0_0_0/60%)]">
+            <div class="mx-auto w-full max-w-[18rem] overflow-hidden rounded-2xl bg-white p-3">
+              <img src="/img/colmi-r02-front.webp" width="1000" height="1000" fetchpriority="high" [alt]="i18n.t('hero.alt')" class="w-full">
             </div>
 
             <div id="buy" class="card mt-6 p-6 sm:p-7">
@@ -114,12 +109,8 @@ function line(values: number[]): string {
       <p class="mt-4 font-mono text-xs text-faint">{{ i18n.t('measure.note') }}</p>
 
       <div class="card mt-10 grid items-center overflow-hidden lg:grid-cols-[1.25fr_.75fr]">
-        <div class="relative px-6 pt-8 lg:p-10">
-          <img src="/img/ring-inside.webp" width="1800" height="1196" loading="lazy" [alt]="i18n.t('inside.alt')" class="w-full">
-          @for (pin of pins; track $index) {
-            <span class="absolute grid h-6 w-6 -translate-x-1/2 -translate-y-[160%] place-items-center rounded-full bg-ink font-mono text-xs font-semibold text-on-ink shadow-lg"
-              [style.left]="pin.x" [style.top]="pin.y" aria-hidden="true">{{ pin.n }}</span>
-          }
+        <div class="p-6 lg:p-10">
+          <img src="/img/colmi-r02-inside.webp" width="1000" height="1000" loading="lazy" [alt]="i18n.t('inside.alt')" class="w-full rounded-2xl">
         </div>
         <div class="p-6 pt-2 lg:p-10">
           <h3 class="text-2xl font-semibold tracking-tight">{{ i18n.t('inside.title') }}</h3>
@@ -177,7 +168,7 @@ function line(values: number[]): string {
         <div>
           <p class="label">{{ i18n.t('specs.label') }}</p>
           <h2 class="headline mt-5 text-4xl sm:text-5xl">{{ i18n.t('specs.title') }}</h2>
-          <img src="/img/ring-thumb.webp" width="360" height="354" loading="lazy" alt="" class="mt-10 hidden w-56 opacity-90 lg:block">
+          <img src="/img/colmi-r02-thumb.webp" width="360" height="360" loading="lazy" alt="" class="mt-10 hidden w-56 rounded-2xl lg:block">
         </div>
         <dl class="border-t hairline">
           @for (row of specs; track row.key) {
@@ -229,7 +220,7 @@ function line(values: number[]): string {
     <section class="shell">
       <div class="card relative overflow-hidden px-6 py-16 text-center sm:py-20">
         <div class="glow absolute left-1/2 top-0 -z-0 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/3 rounded-full"></div>
-        <img src="/img/ring-thumb.webp" width="360" height="354" loading="lazy" alt="" class="relative mx-auto w-40">
+        <img src="/img/colmi-r02-thumb.webp" width="360" height="360" loading="lazy" alt="" class="relative mx-auto w-40 rounded-2xl">
         <h2 class="headline relative mt-8 text-4xl sm:text-6xl">{{ i18n.t('cta.title') }}</h2>
         <p class="lede relative mt-4">{{ i18n.t('cta.copy') }}</p>
         <button type="button" class="btn btn-primary relative mt-9 text-base" [disabled]="!inStock()" (click)="selected() ? buy() : pickSize()">{{ i18n.t('buy.cta') }} · {{ price() }}</button>
@@ -272,8 +263,6 @@ export class HomeComponent {
     { key: 'measure.spo2', color: 'var(--color-spo2)', path: line([97, 98, 97, 96, 98, 97, 99, 98, 97, 98, 98, 97]) },
     { key: 'measure.steps', color: 'var(--color-steps)', bars: true, values: [1, 2, 6, 9, 4, 3, 7, 10, 5, 2] },
   ];
-  /** Positions of the sensor window and the two charging pads in ring-inside.webp. */
-  readonly pins = [{ n: 1, x: '50%', y: '24%' }, { n: 2, x: '37%', y: '30%' }, { n: 2, x: '63%', y: '30%' }];
   readonly insideKeys = ['inside.sensor', 'inside.pads', 'inside.motion'];
   readonly features = [
     { key: 'showcase.f1', color: 'var(--color-pulse)' },

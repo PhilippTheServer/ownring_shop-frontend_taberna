@@ -47,11 +47,24 @@ describe('HomeComponent', () => {
     expect(hero).not.toBeNull();
     const product = hero!.querySelector('[data-testid="hero-product"]');
     const demo = hero!.querySelector('#app app-demo');
-    expect(product?.querySelector('img[src="/img/ring-hero.webp"]')).not.toBeNull();
+    expect(product?.querySelector('img[src="/img/colmi-r02-front.webp"]')).not.toBeNull();
     expect(product?.querySelector('[data-testid="buy"]')).not.toBeNull();
     expect(demo).not.toBeNull();
     expect(el.querySelectorAll('app-demo')).toHaveLength(1);
     expect(product!.compareDocumentPosition(demo!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('uses local static COLMi product images instead of animated custom renders', () => {
+    const { el } = render([r02(11)]);
+    const images = [...el.querySelectorAll<HTMLImageElement>('img')];
+    expect(images.map((image) => image.getAttribute('src'))).toEqual([
+      '/img/colmi-r02-front.webp', '/img/colmi-r02-inside.webp',
+      '/img/colmi-r02-thumb.webp', '/img/colmi-r02-thumb.webp',
+    ]);
+    expect(el.querySelector('.animate-float, .animate-trace')).toBeNull();
+    expect(images[0].alt).toContain('COLMi R02');
+    expect(images[0].getAttribute('fetchpriority')).toBe('high');
+    expect(images.slice(1).every((image) => image.getAttribute('loading') === 'lazy')).toBe(true);
   });
 
   it('removes Why links from both the header and footer while keeping the app link', () => {
