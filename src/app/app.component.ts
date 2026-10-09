@@ -83,7 +83,6 @@ export class AppComponent {
   readonly i18n = inject(I18nService);
   readonly links = [
     { id: 'ring', key: 'nav.ring' },
-    { id: 'why', key: 'nav.why' },
     { id: 'app', key: 'nav.app' },
     { id: 'specs', key: 'nav.specs' },
     { id: 'faq', key: 'nav.faq' },
