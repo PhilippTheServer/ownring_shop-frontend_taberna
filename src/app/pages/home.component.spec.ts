@@ -41,6 +41,19 @@ describe('HomeComponent', () => {
     expect(el.querySelector('#app img')).toBeNull();
   });
 
+  it('puts the ring and buying controls before a single app demo in the landing hero', () => {
+    const { el } = render([r02(11)]);
+    const hero = el.querySelector('#hero');
+    expect(hero).not.toBeNull();
+    const product = hero!.querySelector('[data-testid="hero-product"]');
+    const demo = hero!.querySelector('#app app-demo');
+    expect(product?.querySelector('img[src="/img/ring-hero.webp"]')).not.toBeNull();
+    expect(product?.querySelector('[data-testid="buy"]')).not.toBeNull();
+    expect(demo).not.toBeNull();
+    expect(el.querySelectorAll('app-demo')).toHaveLength(1);
+    expect(product!.compareDocumentPosition(demo!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('removes Why links from both the header and footer while keeping the app link', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
