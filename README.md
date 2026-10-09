@@ -6,7 +6,7 @@ The shop for the **OwnRing R02**: a single-product page plus cart, checkout (gue
 
 | Route | What it is |
 |---|---|
-| `/` | The product page: hero and buy box with the size picker, metrics, why OwnRing, the app, about, datasheet, limits, FAQ. `/shop` and `/shop/:id` redirect here. |
+| `/` | The product page: hero and buy box with the size picker, metrics, interactive app demo, about, datasheet, limits, FAQ. `/shop` and `/shop/:id` redirect here. |
 | `/cart` | Cart |
 | `/checkout` | Checkout. Signed out → guest form (`POST /v1/orders/guest-checkout`); signed in → saved address and the account order flow. No sign-in required. |
 | `/account` | Customer account (sign-in required) |
@@ -24,7 +24,9 @@ Dark, matched to the OwnRing app's design tokens (`app/lib/ui/tokens.dart` in th
 Pictures live in `public/img/` and can be replaced by photos with the same file names:
 
 - `ring-hero.webp`, `ring-inside.webp`, `ring-thumb.webp` — renders of the R02, produced by `tools/ring-render/` (see its README).
-- `app-today.webp`, `app-devices.webp` — screenshots of the OwnRing app (status bar cropped).
+- `app-today.webp`, `app-devices.webp` — reference screenshots of the OwnRing app (status bar cropped), no longer displayed on the product page.
+
+The app section embeds `src/app/components/app-demo.component.ts`, a lightweight simulation of the Today and Devices screens. Visitors can expand the five metrics, switch day/week/month/year, start/stop a sample live-pulse display, simulate sync and connect/disconnect, and switch German/English. All readings are invented and labelled as sample data; the demo needs no backend, Bluetooth, login or additional dependency. It is not the Flutter app and does not reproduce real measurement timing or ring discovery.
 
 ## Configuration
 
