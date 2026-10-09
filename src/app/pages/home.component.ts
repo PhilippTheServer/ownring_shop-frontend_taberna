@@ -7,6 +7,7 @@ import { I18nService } from '../core/i18n.service';
 import { money, ringSize } from '../core/format';
 import { Item } from '../models';
 import { storefrontConfig } from '../storefront.config';
+import { AppDemoComponent } from '../components/app-demo.component';
 
 /** Draws a sparkline into a 120 × 36 box. */
 function line(values: number[]): string {
@@ -15,7 +16,7 @@ function line(values: number[]): string {
 }
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, AppDemoComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Hero -->
@@ -131,54 +132,6 @@ function line(values: number[]): string {
       </div>
     </section>
 
-    <!-- Why -->
-    <section id="why" class="border-t hairline">
-      <div class="shell py-20 lg:py-28">
-        <div class="max-w-2xl">
-          <p class="label">{{ i18n.t('why.label') }}</p>
-          <h2 class="headline mt-5 text-4xl sm:text-5xl">{{ i18n.t('why.title') }}</h2>
-          <p class="lede mt-5">{{ i18n.t('why.copy') }}</p>
-        </div>
-        <div class="mt-12 grid gap-3 lg:grid-cols-3">
-          <article class="card min-w-0 p-7 lg:col-span-2">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.cloud.title') }}</h3>
-            <p class="mt-3 max-w-xl leading-7 text-muted">{{ i18n.t('why.cloud.copy') }}</p>
-            <pre class="inset mt-6 overflow-x-auto p-4 font-mono text-[13px] leading-6"><span class="text-faint">$</span> aapt2 dump permissions app-release.apk | grep -c INTERNET
-0
-<span class="text-faint">$</span> tool/check_release_permissions.sh
-<span class="text-steps">OK: keine INTERNET-Berechtigung im Release-APK</span></pre>
-          </article>
-          <article class="card flex min-w-0 flex-col p-7">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.sub.title') }}</h3>
-            <p class="mt-3 leading-7 text-muted">{{ i18n.t('why.sub.copy') }}</p>
-            <p class="mt-auto pt-8 font-mono text-3xl font-semibold tracking-tight text-pulse">{{ i18n.t('why.sub.figure') }}</p>
-          </article>
-          <article class="card min-w-0 p-7">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.account.title') }}</h3>
-            <p class="mt-3 leading-7 text-muted">{{ i18n.t('why.account.copy') }}</p>
-          </article>
-          <article class="card min-w-0 p-7 lg:col-span-2">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.clean.title') }}</h3>
-            <p class="mt-3 max-w-xl leading-7 text-muted">{{ i18n.t('why.clean.copy') }}</p>
-            <pre class="inset mt-6 overflow-x-auto p-4 font-mono text-[13px] leading-6"><span class="text-faint">→</span> <span class="text-pulse">69 01 01</span> 00 00 00 00 00 00 00 00 00 00 00 00 <span class="text-hrv">6b</span>  <span class="text-faint"># {{ i18n.t('why.hex.start') }}</span>
-<span class="text-faint">←</span> <span class="text-pulse">69 01 00</span> <span class="text-steps">48</span> …                                  <span class="text-faint"># {{ i18n.t('why.hex.reply') }}</span></pre>
-          </article>
-          <article class="card grid min-w-0 gap-6 p-7 lg:col-span-3 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.android.title') }}</h3>
-              <p class="mt-3 max-w-2xl leading-7 text-muted">{{ i18n.t('why.android.copy') }}</p>
-            </div>
-            <ul class="space-y-1.5 font-mono text-xs text-muted">
-              <li><span class="text-steps">✓</span> BLUETOOTH_SCAN <span class="text-faint">neverForLocation</span></li>
-              <li><span class="text-steps">✓</span> BLUETOOTH_CONNECT</li>
-              <li><span class="text-pulse">✕</span> INTERNET</li>
-              <li><span class="text-pulse">✕</span> ACCESS_FINE_LOCATION</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
     <!-- App -->
     <section id="app" class="border-t hairline">
       <div class="shell grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28">
@@ -193,16 +146,9 @@ function line(values: number[]): string {
           </ul>
           <p class="mt-6 font-mono text-xs text-faint">{{ i18n.t('showcase.req') }}</p>
         </div>
-        <div class="relative flex justify-center gap-4 sm:gap-6">
+        <div class="relative min-w-0">
           <div class="glow absolute inset-0 -z-10 rounded-full opacity-70"></div>
-          @for (shot of shots; track shot.src; let i = $index) {
-            <figure class="w-[46%] max-w-[16.5rem]" [class.translate-y-10]="i === 1">
-              <div class="rounded-[2.4rem] border border-white/10 bg-black p-[5px] shadow-[0_30px_80px_rgb(0_0_0/70%)]">
-                <img [src]="shot.src" width="720" height="1493" loading="lazy" [alt]="i18n.t(shot.alt)" class="w-full rounded-[2.1rem]">
-              </div>
-              <figcaption class="label mt-4 text-center">{{ i18n.t(shot.caption) }}</figcaption>
-            </figure>
-          }
+          <app-demo />
         </div>
       </div>
     </section>
@@ -338,10 +284,6 @@ export class HomeComponent {
     { key: 'showcase.f2', color: 'var(--color-hrv)' },
     { key: 'showcase.f3', color: 'var(--color-spo2)' },
     { key: 'showcase.f4', color: 'var(--color-steps)' },
-  ];
-  readonly shots = [
-    { src: '/img/app-today.webp', alt: 'showcase.alt.today', caption: 'showcase.today' },
-    { src: '/img/app-devices.webp', alt: 'showcase.alt.devices', caption: 'showcase.devices' },
   ];
   readonly specs: Array<{ key: string; value?: string }> = [
     { key: 'specs.hardware', value: 'COLMi R02' },
