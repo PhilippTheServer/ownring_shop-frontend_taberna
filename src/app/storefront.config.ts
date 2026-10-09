@@ -22,27 +22,27 @@ export const storefrontConfig = {
   /**
    * Anonymous shopper telemetry.
    *
-   * Off by default: cloning this repository must not start collecting anything.
-   * Turning it on also requires STOREFRONT_ANALYTICS_ENABLED on the API, which
+   * Enabled for the OwnRing local monitoring stack. Also requires
+   * STOREFRONT_ANALYTICS_ENABLED on the API, which
    * otherwise answers the ingest endpoint with a 404.
    *
-   * Nothing collected identifies a person and nothing persists beyond the tab,
-   * so no consent banner is required. Point `endpoint` elsewhere to use a
+   * Uses a per-tab identifier, not a tracking cookie. Review privacy and consent
+   * requirements before public deployment. Point `endpoint` elsewhere to use a
    * different backend — no page imports an analytics library directly.
    */
   analytics: {
-    enabled: false,
+    enabled: true,
     endpoint: '/api/v1/analytics/events',
   },
 
   /**
    * Uncaught error reporting.
    *
-   * Off by default, like analytics. Requires FRONTEND_ERRORS_ENABLED on the
+   * Enabled for OwnRing. Requires FRONTEND_ERRORS_ENABLED on the
    * API, which otherwise answers the endpoint with a 404.
    */
   errorReporting: {
-    enabled: false,
+    enabled: true,
     endpoint: '/api/v1/telemetry/errors',
   },
 } as const;

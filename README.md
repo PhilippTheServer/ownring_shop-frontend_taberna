@@ -43,6 +43,12 @@ The defaults match the development stack:
 
 Set `stripePublishableKey` (and `paypalClientId` for PayPal) in `src/app/storefront.config.ts` before testing payment.
 
+### Monitoring
+
+OwnRing enables the inherited OpenTaberna error reporter and shopper analytics in `src/app/storefront.config.ts`. The API must also set `FRONTEND_ERRORS_ENABLED=true` and `STOREFRONT_ANALYTICS_ENABLED=true`; the umbrella's local compose does this. These are build-time flags: rebuild the frontend after changing them. Global browser errors and unhandled promise rejections are forwarded through Angular's `ErrorHandler`, alongside Angular errors.
+
+Errors remain batched and rate/session capped, with delivery failures swallowed; analytics uses a per-tab session ID and strips route queries/fragments. The admin Errors and Analytics pages display the collected records. No vendor SDK or external telemetry destination was added. Messages/stacks may contain sensitive data, and records persist on the API even after a tab closes. The privacy page describes collection; consent/legal basis, redaction and deletion policies still need review before public deployment. The monitoring stack and its limits are documented in the umbrella's `docs/deployment.md`.
+
 ## Run with Docker
 
 ```bash

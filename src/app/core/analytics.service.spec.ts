@@ -10,6 +10,7 @@ import { storefrontConfig } from '../storefront.config';
  * of this class, so they are pinned here.
  */
 describe('AnalyticsService', () => {
+  const configuredEnabled = storefrontConfig.analytics.enabled;
   let sent: Array<Record<string, unknown>>;
   let service: AnalyticsService;
   let originalFetch: typeof globalThis.fetch;
@@ -39,16 +40,15 @@ describe('AnalyticsService', () => {
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    (storefrontConfig.analytics as { enabled: boolean }).enabled = false;
+    (storefrontConfig.analytics as { enabled: boolean }).enabled = configuredEnabled;
   });
 
   // -------------------------------------------------------------------------
-  // Off by default
+  // OwnRing opts in; operators can still switch analytics off
   // -------------------------------------------------------------------------
 
-  it('is disabled in the shipped configuration', () => {
-    // Cloning the repository must not start collecting anything.
-    expect(storefrontConfig.analytics.enabled).toBe(false);
+  it('is enabled in the OwnRing configuration', () => {
+    expect(storefrontConfig.analytics.enabled).toBe(true);
   });
 
   it('sends nothing at all when disabled', () => {

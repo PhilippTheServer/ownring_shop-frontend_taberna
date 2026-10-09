@@ -37,8 +37,7 @@ const MAX_STACK_CHARS = 4000;
  * swallowed. A reporter that turns a render loop into a request loop has taken
  * a broken page and made it a broken page plus a hammered API.
  *
- * **Off by default**, like the analytics port. Cloning this repository must not
- * start sending anything anywhere.
+ * OwnRing opts in through storefrontConfig; switching it off sends nothing.
  */
 @Injectable({ providedIn: 'root' })
 export class ErrorReportingService {
