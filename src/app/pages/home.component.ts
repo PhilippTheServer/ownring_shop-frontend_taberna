@@ -7,6 +7,7 @@ import { I18nService } from '../core/i18n.service';
 import { money, ringSize } from '../core/format';
 import { Item } from '../models';
 import { storefrontConfig } from '../storefront.config';
+import { AppDemoComponent } from '../components/app-demo.component';
 
 /** Draws a sparkline into a 120 × 36 box. */
 function line(values: number[]): string {
@@ -15,74 +16,69 @@ function line(values: number[]): string {
 }
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, AppDemoComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Hero -->
-    <section class="relative overflow-hidden">
+    <section id="hero" class="relative overflow-hidden">
       <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(56rem_34rem_at_72%_32%,rgb(250_135_133/8%),transparent_70%)]"></div>
-      <div class="shell grid items-center gap-8 pb-20 pt-6 sm:pt-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-4 lg:pb-28 lg:pt-20">
-        <div>
-          <p class="label">{{ i18n.t('hero.eyebrow') }}</p>
-          <h1 class="headline mt-6 text-[2.9rem] sm:text-7xl lg:text-[5.2rem]">
-            {{ i18n.t('hero.title1') }}<br>{{ i18n.t('hero.title2') }}<br><span class="text-pulse">{{ i18n.t('hero.title3') }}</span>
-          </h1>
-          <p class="lede mt-7 max-w-xl">{{ i18n.t('hero.copy') }}</p>
-          <ul class="mt-7 flex flex-wrap gap-2">
-            @for (chip of chips; track chip) {
-              <li class="flex items-center gap-2 rounded-full border hairline px-3.5 py-1.5 font-mono text-xs text-muted"><span class="dot bg-steps"></span>{{ i18n.t(chip) }}</li>
-            }
-          </ul>
-
-          <div id="buy" class="card mt-10 max-w-xl p-6 sm:p-7">
-            <div class="flex flex-wrap items-baseline justify-between gap-4">
-              <p class="flex items-baseline gap-3">
-                <span class="text-5xl font-semibold tracking-tight" data-testid="price">{{ price() }}</span>
-                <span class="text-muted">{{ i18n.t('price.oneTime') }}</span>
-              </p>
-              @if (sizes().length) {
-                <p class="flex items-center gap-2 text-sm">
-                  <span class="dot" [class.bg-steps]="inStock()" [class.bg-stress]="!inStock()"></span>{{ inStock() ? i18n.t('stock.in') : i18n.t('stock.out') }}
-                </p>
-              }
+      <div class="shell pb-20 pt-6 sm:pt-10 lg:pb-28 lg:pt-12">
+        <p class="label">{{ i18n.t('hero.eyebrow') }}</p>
+        <h1 class="headline mt-4 text-3xl sm:text-4xl lg:text-5xl">
+          {{ i18n.t('hero.title1') }} {{ i18n.t('hero.title2') }} <span class="text-pulse">{{ i18n.t('hero.title3') }}</span>
+        </h1>
+        <div class="mt-8 grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+          <div class="mx-auto w-full min-w-0 max-w-xl" data-testid="hero-product">
+            <div class="mx-auto w-full max-w-[18rem] overflow-hidden rounded-2xl bg-white p-3">
+              <img src="/img/colmi-r02-front.webp" width="1000" height="1000" fetchpriority="high" [alt]="i18n.t('hero.alt')" class="w-full">
             </div>
-            <fieldset class="mt-6">
-              <legend class="flex w-full items-baseline justify-between text-sm">
-                <span>{{ i18n.t('size.pick') }}</span>
-                <a routerLink="/" fragment="faq" class="text-muted transition hover:text-ink">{{ i18n.t('size.help') }}</a>
-              </legend>
-              <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
-                @for (s of sizes(); track s.uuid) {
-                  <button type="button" class="size" [class.selected]="selected()?.uuid === s.uuid" [disabled]="!available(s)"
-                    [attr.aria-pressed]="selected()?.uuid === s.uuid" [attr.data-testid]="'size-' + size(s)" (click)="selected.set(s)">
-                    <span class="block text-lg font-semibold">{{ size(s) }}</span>
-                    <span class="block font-mono text-[11px] text-faint">Ø {{ diameter(s) }}</span>
-                  </button>
+
+            <div id="buy" class="card mt-6 p-6 sm:p-7">
+              <div class="flex flex-wrap items-baseline justify-between gap-4">
+                <p class="flex items-baseline gap-3">
+                  <span class="text-5xl font-semibold tracking-tight" data-testid="price">{{ price() }}</span>
+                  <span class="text-muted">{{ i18n.t('price.oneTime') }}</span>
+                </p>
+                @if (sizes().length) {
+                  <p class="flex items-center gap-2 text-sm">
+                    <span class="dot" [class.bg-steps]="inStock()" [class.bg-stress]="!inStock()"></span>{{ inStock() ? i18n.t('stock.in') : i18n.t('stock.out') }}
+                  </p>
                 }
               </div>
-            </fieldset>
-            <button type="button" class="btn btn-primary mt-6 w-full text-base" data-testid="buy" [disabled]="!canBuy()" (click)="buy()">
-              @if (selected(); as s) { {{ i18n.t('buy.cta') }} · {{ i18n.t('size.label') }} {{ size(s) }} } @else { {{ i18n.t('buy.pickSize') }} }
-            </button>
-            @if (loadError()) { <p class="mt-4 text-sm text-pulse">{{ i18n.t('buy.loadError') }}</p> }
-            <p class="mt-5 border-t hairline pt-4 text-sm text-muted">{{ i18n.t('buy.trust') }}</p>
-            <p class="mt-1.5 text-xs leading-5 text-faint">{{ i18n.t('price.note') }}</p>
+              <fieldset class="mt-6">
+                <legend class="flex w-full items-baseline justify-between text-sm">
+                  <span>{{ i18n.t('size.pick') }}</span>
+                  <a routerLink="/" fragment="faq" class="text-muted transition hover:text-ink">{{ i18n.t('size.help') }}</a>
+                </legend>
+                <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                  @for (s of sizes(); track s.uuid) {
+                    <button type="button" class="size" [class.selected]="selected()?.uuid === s.uuid" [disabled]="!available(s)"
+                      [attr.aria-pressed]="selected()?.uuid === s.uuid" [attr.data-testid]="'size-' + size(s)" (click)="selected.set(s)">
+                      <span class="block text-lg font-semibold">{{ size(s) }}</span>
+                      <span class="block font-mono text-[11px] text-faint">Ø {{ diameter(s) }}</span>
+                    </button>
+                  }
+                </div>
+              </fieldset>
+              <button type="button" class="btn btn-primary mt-6 w-full text-base" data-testid="buy" [disabled]="!canBuy()" (click)="buy()">
+                @if (selected(); as s) { {{ i18n.t('buy.cta') }} · {{ i18n.t('size.label') }} {{ size(s) }} } @else { {{ i18n.t('buy.pickSize') }} }
+              </button>
+              @if (loadError()) { <p class="mt-4 text-sm text-pulse">{{ i18n.t('buy.loadError') }}</p> }
+              <p class="mt-5 border-t hairline pt-4 text-sm text-muted">{{ i18n.t('buy.trust') }}</p>
+              <p class="mt-1.5 text-xs leading-5 text-faint">{{ i18n.t('price.note') }}</p>
+            </div>
+          </div>
+          <div id="app" class="relative min-w-0">
+            <div class="glow absolute inset-0 -z-10 rounded-full opacity-70"></div>
+            <app-demo />
           </div>
         </div>
-
-        <div class="relative order-first mx-auto w-full max-w-[18rem] sm:max-w-[28rem] lg:order-none lg:max-w-[34rem]">
-          <div class="glow absolute inset-[-8%] -z-10 rounded-full"></div>
-          <svg viewBox="0 0 600 120" class="absolute inset-x-[-10%] top-1/2 -z-10 w-[120%] -translate-y-1/2 opacity-40" aria-hidden="true">
-            <path pathLength="1" class="animate-trace" fill="none" stroke="var(--color-pulse)" stroke-width="1.5" stroke-linejoin="round"
-              d="M0 60 H170 L185 60 L195 30 L208 98 L220 12 L232 84 L242 60 H360 L372 60 L380 44 L390 76 L398 60 H600" />
-          </svg>
-          <img src="/img/ring-hero.webp" width="1667" height="1637" fetchpriority="high" [alt]="i18n.t('hero.alt')" class="animate-float w-full drop-shadow-[0_40px_60px_rgb(0_0_0/60%)]">
-          <div class="card absolute bottom-[6%] left-0 flex items-center gap-3 px-4 py-3 shadow-2xl sm:left-[-4%]" aria-hidden="true">
-            <span class="dot animate-beat bg-pulse"></span>
-            <span class="font-mono text-sm"><span class="text-2xl font-semibold tracking-tight">72</span> bpm</span>
-            <span class="label !text-[10px]">live</span>
-          </div>
-        </div>
+        <p class="lede mt-8 max-w-2xl">{{ i18n.t('hero.copy') }}</p>
+        <ul class="mt-6 flex flex-wrap gap-2">
+          @for (chip of chips; track chip) {
+            <li class="flex items-center gap-2 rounded-full border hairline px-3.5 py-1.5 font-mono text-xs text-muted"><span class="dot bg-steps"></span>{{ i18n.t(chip) }}</li>
+          }
+        </ul>
       </div>
     </section>
 
@@ -113,12 +109,8 @@ function line(values: number[]): string {
       <p class="mt-4 font-mono text-xs text-faint">{{ i18n.t('measure.note') }}</p>
 
       <div class="card mt-10 grid items-center overflow-hidden lg:grid-cols-[1.25fr_.75fr]">
-        <div class="relative px-6 pt-8 lg:p-10">
-          <img src="/img/ring-inside.webp" width="1800" height="1196" loading="lazy" [alt]="i18n.t('inside.alt')" class="w-full">
-          @for (pin of pins; track $index) {
-            <span class="absolute grid h-6 w-6 -translate-x-1/2 -translate-y-[160%] place-items-center rounded-full bg-ink font-mono text-xs font-semibold text-on-ink shadow-lg"
-              [style.left]="pin.x" [style.top]="pin.y" aria-hidden="true">{{ pin.n }}</span>
-          }
+        <div class="p-6 lg:p-10">
+          <img src="/img/colmi-r02-inside.webp" width="1000" height="1000" loading="lazy" [alt]="i18n.t('inside.alt')" class="w-full rounded-2xl">
         </div>
         <div class="p-6 pt-2 lg:p-10">
           <h3 class="text-2xl font-semibold tracking-tight">{{ i18n.t('inside.title') }}</h3>
@@ -131,58 +123,10 @@ function line(values: number[]): string {
       </div>
     </section>
 
-    <!-- Why -->
-    <section id="why" class="border-t hairline">
+    <!-- App -->
+    <section class="border-t hairline">
       <div class="shell py-20 lg:py-28">
         <div class="max-w-2xl">
-          <p class="label">{{ i18n.t('why.label') }}</p>
-          <h2 class="headline mt-5 text-4xl sm:text-5xl">{{ i18n.t('why.title') }}</h2>
-          <p class="lede mt-5">{{ i18n.t('why.copy') }}</p>
-        </div>
-        <div class="mt-12 grid gap-3 lg:grid-cols-3">
-          <article class="card min-w-0 p-7 lg:col-span-2">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.cloud.title') }}</h3>
-            <p class="mt-3 max-w-xl leading-7 text-muted">{{ i18n.t('why.cloud.copy') }}</p>
-            <pre class="inset mt-6 overflow-x-auto p-4 font-mono text-[13px] leading-6"><span class="text-faint">$</span> aapt2 dump permissions app-release.apk | grep -c INTERNET
-0
-<span class="text-faint">$</span> tool/check_release_permissions.sh
-<span class="text-steps">OK: keine INTERNET-Berechtigung im Release-APK</span></pre>
-          </article>
-          <article class="card flex min-w-0 flex-col p-7">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.sub.title') }}</h3>
-            <p class="mt-3 leading-7 text-muted">{{ i18n.t('why.sub.copy') }}</p>
-            <p class="mt-auto pt-8 font-mono text-3xl font-semibold tracking-tight text-pulse">{{ i18n.t('why.sub.figure') }}</p>
-          </article>
-          <article class="card min-w-0 p-7">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.account.title') }}</h3>
-            <p class="mt-3 leading-7 text-muted">{{ i18n.t('why.account.copy') }}</p>
-          </article>
-          <article class="card min-w-0 p-7 lg:col-span-2">
-            <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.clean.title') }}</h3>
-            <p class="mt-3 max-w-xl leading-7 text-muted">{{ i18n.t('why.clean.copy') }}</p>
-            <pre class="inset mt-6 overflow-x-auto p-4 font-mono text-[13px] leading-6"><span class="text-faint">→</span> <span class="text-pulse">69 01 01</span> 00 00 00 00 00 00 00 00 00 00 00 00 <span class="text-hrv">6b</span>  <span class="text-faint"># {{ i18n.t('why.hex.start') }}</span>
-<span class="text-faint">←</span> <span class="text-pulse">69 01 00</span> <span class="text-steps">48</span> …                                  <span class="text-faint"># {{ i18n.t('why.hex.reply') }}</span></pre>
-          </article>
-          <article class="card grid min-w-0 gap-6 p-7 lg:col-span-3 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <h3 class="text-xl font-semibold tracking-tight">{{ i18n.t('why.android.title') }}</h3>
-              <p class="mt-3 max-w-2xl leading-7 text-muted">{{ i18n.t('why.android.copy') }}</p>
-            </div>
-            <ul class="space-y-1.5 font-mono text-xs text-muted">
-              <li><span class="text-steps">✓</span> BLUETOOTH_SCAN <span class="text-faint">neverForLocation</span></li>
-              <li><span class="text-steps">✓</span> BLUETOOTH_CONNECT</li>
-              <li><span class="text-pulse">✕</span> INTERNET</li>
-              <li><span class="text-pulse">✕</span> ACCESS_FINE_LOCATION</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- App -->
-    <section id="app" class="border-t hairline">
-      <div class="shell grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28">
-        <div>
           <p class="label">{{ i18n.t('showcase.label') }}</p>
           <h2 class="headline mt-5 text-4xl sm:text-5xl">{{ i18n.t('showcase.title') }}</h2>
           <p class="lede mt-5">{{ i18n.t('showcase.copy') }}</p>
@@ -192,17 +136,6 @@ function line(values: number[]): string {
             }
           </ul>
           <p class="mt-6 font-mono text-xs text-faint">{{ i18n.t('showcase.req') }}</p>
-        </div>
-        <div class="relative flex justify-center gap-4 sm:gap-6">
-          <div class="glow absolute inset-0 -z-10 rounded-full opacity-70"></div>
-          @for (shot of shots; track shot.src; let i = $index) {
-            <figure class="w-[46%] max-w-[16.5rem]" [class.translate-y-10]="i === 1">
-              <div class="rounded-[2.4rem] border border-white/10 bg-black p-[5px] shadow-[0_30px_80px_rgb(0_0_0/70%)]">
-                <img [src]="shot.src" width="720" height="1493" loading="lazy" [alt]="i18n.t(shot.alt)" class="w-full rounded-[2.1rem]">
-              </div>
-              <figcaption class="label mt-4 text-center">{{ i18n.t(shot.caption) }}</figcaption>
-            </figure>
-          }
         </div>
       </div>
     </section>
@@ -235,7 +168,7 @@ function line(values: number[]): string {
         <div>
           <p class="label">{{ i18n.t('specs.label') }}</p>
           <h2 class="headline mt-5 text-4xl sm:text-5xl">{{ i18n.t('specs.title') }}</h2>
-          <img src="/img/ring-thumb.webp" width="360" height="354" loading="lazy" alt="" class="mt-10 hidden w-56 opacity-90 lg:block">
+          <img src="/img/colmi-r02-thumb.webp" width="360" height="360" loading="lazy" alt="" class="mt-10 hidden w-56 rounded-2xl lg:block">
         </div>
         <dl class="border-t hairline">
           @for (row of specs; track row.key) {
@@ -287,7 +220,7 @@ function line(values: number[]): string {
     <section class="shell">
       <div class="card relative overflow-hidden px-6 py-16 text-center sm:py-20">
         <div class="glow absolute left-1/2 top-0 -z-0 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/3 rounded-full"></div>
-        <img src="/img/ring-thumb.webp" width="360" height="354" loading="lazy" alt="" class="relative mx-auto w-40">
+        <img src="/img/colmi-r02-thumb.webp" width="360" height="360" loading="lazy" alt="" class="relative mx-auto w-40 rounded-2xl">
         <h2 class="headline relative mt-8 text-4xl sm:text-6xl">{{ i18n.t('cta.title') }}</h2>
         <p class="lede relative mt-4">{{ i18n.t('cta.copy') }}</p>
         <button type="button" class="btn btn-primary relative mt-9 text-base" [disabled]="!inStock()" (click)="selected() ? buy() : pickSize()">{{ i18n.t('buy.cta') }} · {{ price() }}</button>
@@ -330,18 +263,12 @@ export class HomeComponent {
     { key: 'measure.spo2', color: 'var(--color-spo2)', path: line([97, 98, 97, 96, 98, 97, 99, 98, 97, 98, 98, 97]) },
     { key: 'measure.steps', color: 'var(--color-steps)', bars: true, values: [1, 2, 6, 9, 4, 3, 7, 10, 5, 2] },
   ];
-  /** Positions of the sensor window and the two charging pads in ring-inside.webp. */
-  readonly pins = [{ n: 1, x: '50%', y: '24%' }, { n: 2, x: '37%', y: '30%' }, { n: 2, x: '63%', y: '30%' }];
   readonly insideKeys = ['inside.sensor', 'inside.pads', 'inside.motion'];
   readonly features = [
     { key: 'showcase.f1', color: 'var(--color-pulse)' },
     { key: 'showcase.f2', color: 'var(--color-hrv)' },
     { key: 'showcase.f3', color: 'var(--color-spo2)' },
     { key: 'showcase.f4', color: 'var(--color-steps)' },
-  ];
-  readonly shots = [
-    { src: '/img/app-today.webp', alt: 'showcase.alt.today', caption: 'showcase.today' },
-    { src: '/img/app-devices.webp', alt: 'showcase.alt.devices', caption: 'showcase.devices' },
   ];
   readonly specs: Array<{ key: string; value?: string }> = [
     { key: 'specs.hardware', value: 'COLMi R02' },

@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { HomeComponent } from './home.component';
+import { AppComponent } from '../app.component';
 import { CartService } from '../core/cart.service';
 import { Item } from '../models';
 import { r02, stubStorage } from '../test-fixtures';
@@ -32,6 +33,47 @@ describe('HomeComponent', () => {
   }
 
   const sizes = (el: HTMLElement) => [...el.querySelectorAll<HTMLButtonElement>('[data-testid^="size-"]')];
+
+  it('replaces the Why section and static app screenshots with a clickable demo', () => {
+    const { el } = render([r02(11)]);
+    expect(el.querySelector('#why')).toBeNull();
+    expect(el.querySelector('#app app-demo')).not.toBeNull();
+    expect(el.querySelector('#app img')).toBeNull();
+  });
+
+  it('puts the ring and buying controls before a single app demo in the landing hero', () => {
+    const { el } = render([r02(11)]);
+    const hero = el.querySelector('#hero');
+    expect(hero).not.toBeNull();
+    const product = hero!.querySelector('[data-testid="hero-product"]');
+    const demo = hero!.querySelector('#app app-demo');
+    expect(product?.querySelector('img[src="/img/colmi-r02-front.webp"]')).not.toBeNull();
+    expect(product?.querySelector('[data-testid="buy"]')).not.toBeNull();
+    expect(demo).not.toBeNull();
+    expect(el.querySelectorAll('app-demo')).toHaveLength(1);
+    expect(product!.compareDocumentPosition(demo!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('uses local static COLMi product images instead of animated custom renders', () => {
+    const { el } = render([r02(11)]);
+    const images = [...el.querySelectorAll<HTMLImageElement>('img')];
+    expect(images.map((image) => image.getAttribute('src'))).toEqual([
+      '/img/colmi-r02-front.webp', '/img/colmi-r02-inside.webp',
+      '/img/colmi-r02-thumb.webp', '/img/colmi-r02-thumb.webp',
+    ]);
+    expect(el.querySelector('.animate-float, .animate-trace')).toBeNull();
+    expect(images[0].alt).toContain('COLMi R02');
+    expect(images[0].getAttribute('fetchpriority')).toBe('high');
+    expect(images.slice(1).every((image) => image.getAttribute('loading') === 'lazy')).toBe(true);
+  });
+
+  it('removes Why links from both the header and footer while keeping the app link', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('a[href="/#why"]')).toBeNull();
+    expect(el.querySelectorAll('a[href="/#app"]')).toHaveLength(2);
+  });
 
   it('shows the catalogue price of the R02', () => {
     const { el } = render([r02(11, { price: { amount: 12900, currency: 'EUR' } })]);

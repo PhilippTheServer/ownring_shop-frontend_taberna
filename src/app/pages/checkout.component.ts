@@ -121,7 +121,7 @@ const SHIPPING_COUNTRIES = ['DE', 'AT', 'BE', 'BG', 'CY', 'CZ', 'DK', 'EE', 'ES'
             <div class="mt-5 space-y-4">
               @for (line of cart.lines(); track line.item.uuid) {
                 <div class="flex items-center gap-4">
-                  <div class="inset grid h-16 w-16 shrink-0 place-items-center p-1.5"><img src="/img/ring-thumb.webp" width="360" height="354" alt=""></div>
+                  <div class="inset grid h-16 w-16 shrink-0 place-items-center p-1.5"><img src="/img/colmi-r02-thumb.webp" width="360" height="360" alt="" class="rounded-lg"></div>
                   <div class="flex-1 text-sm"><p class="font-medium">{{ label(line.item) }}</p><p class="font-mono text-xs text-faint">{{ line.quantity }} ×</p></div>
                   <strong class="font-mono">{{ format(line.item.price.amount * line.quantity) }}</strong>
                 </div>

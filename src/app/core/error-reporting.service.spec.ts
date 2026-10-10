@@ -13,6 +13,7 @@ import { storefrontConfig } from '../storefront.config';
  * loop — and that stop it making anything worse.
  */
 describe('ErrorReportingService', () => {
+  const configuredEnabled = storefrontConfig.errorReporting.enabled;
   let sent: Array<{ errors: Array<Record<string, unknown>> }>;
   let calls: number;
   let originalFetch: typeof globalThis.fetch;
@@ -41,15 +42,15 @@ describe('ErrorReportingService', () => {
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    (storefrontConfig.errorReporting as { enabled: boolean }).enabled = false;
+    (storefrontConfig.errorReporting as { enabled: boolean }).enabled = configuredEnabled;
   });
 
   // -------------------------------------------------------------------------
-  // Off by default
+  // OwnRing opts in; operators can still switch reporting off
   // -------------------------------------------------------------------------
 
-  it('is disabled in the shipped configuration', () => {
-    expect(storefrontConfig.errorReporting.enabled).toBe(false);
+  it('is enabled in the OwnRing configuration', () => {
+    expect(storefrontConfig.errorReporting.enabled).toBe(true);
   });
 
   it('sends nothing when disabled', () => {
